@@ -3,10 +3,21 @@ const chatMessages = document.querySelector(".chat-messages")
 const socket = io();
 
 
+// Get username and room from URL
+
+const {username, room} = Qs.parse(location.search,{
+    ignoreQueryPrefix: true,
+})
+
+
+// Join chatroom
+
+socket.emit("joinRoom",{username,room});
+
 
 socket.on("message",(message)=>{
     console.log(message);
-    outputMessage(message.username,message.text,message.time);
+    outputMessage(message);
 
     // scroll down to latest message
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -31,12 +42,12 @@ chatFrom.addEventListener("submit",(e)=>{
 
 // output message to dom
 
-function outputMessage(username,message,time){
+function outputMessage(message){
     const div = document.createElement("div");
     div.classList.add("message");
-    div.innerHTML = `<p class="meta">${username} <span>${time}</span></p>
+    div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
     <p class="text">
-        ${message}
+        ${message.text}
     </p>`;
     document.querySelector(".chat-messages").appendChild(div);
 }
